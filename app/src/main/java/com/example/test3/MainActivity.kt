@@ -28,7 +28,16 @@ import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
-
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.AttributeSet
+import android.view.View
+import io.realm.RealmConfiguration
+import com.example.test3.DatabaseActivity as DatabaseActivity
 
 class MainActivity : AppCompatActivity() {
     private val PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0
@@ -36,16 +45,26 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var realm: Realm
 
+    private var floor:Int = 1
+    private var place: String=""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*val myView = MyView(this)
+        setContentView(myView)*/
+
+        imageView2.visibility = View.INVISIBLE
+
         db_button.setOnClickListener { startActivity<DatabaseActivity>() }
 
         //データベースの再構築
-        /*val realmConfig = RealmConfiguration.Builder()
+        /*Realm.init(this)
+        val realmConfig = RealmConfiguration.Builder()
             .deleteRealmIfMigrationNeeded()
-            .build()*/
+            .build()
+        realm = Realm.getInstance(realmConfig)*/
 
         realm = Realm.getDefaultInstance()
 
@@ -69,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -55
             wifiInfo.ssid3 = "Fujiwara lab 3"
             wifiInfo.level3 = -64
+            wifiInfo.floor = 3
         }
 
         realm.executeTransaction {
@@ -83,6 +103,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -48
             wifiInfo.ssid3 = "KITAMURA-LAB2"
             wifiInfo.level3 = -60
+            wifiInfo.floor = 3
         }
 
         realm.executeTransaction {
@@ -97,6 +118,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -59
             wifiInfo.ssid3 = "DIRECT-UcSURFACE-KITAMURmsWW"
             wifiInfo.level3 = -63
+            wifiInfo.floor = 3
         }
 
         realm.executeTransaction {
@@ -111,6 +133,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -56
             wifiInfo.ssid3 = "NagataLab-WiFi"
             wifiInfo.level3 = -62
+            wifiInfo.floor = 3
         }
 
         realm.executeTransaction {
@@ -125,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -44
             wifiInfo.ssid3 = "imura-lab-wifi-g"
             wifiInfo.level3 = -73
+            wifiInfo.floor = 3
         }
 
         realm.executeTransaction {
@@ -139,6 +163,7 @@ class MainActivity : AppCompatActivity() {
             wifiInfo.level2 = -47
             wifiInfo.ssid3 = "IST-HSI"
             wifiInfo.level3 = -66
+            wifiInfo.floor = 4
         }
 
         //データベースのデータを取得
@@ -147,6 +172,41 @@ class MainActivity : AppCompatActivity() {
         textView.setText(level[0]?.level1.toString())*/
 
     }
+
+    // Viewを継承したクラス
+    /*internal inner class MyView(context: Context) : View(context) {
+        private var paint: Paint = Paint()
+
+        // 描画するラインの太さ
+        private val lineStrokeWidth = 20f
+
+        init {
+        }
+
+        override fun onDraw(canvas: Canvas){
+
+           var bitmap1 : Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.threef)
+            canvas.setBitmap(bitmap1)
+
+            //imageView.setImageResource(R.drawable.first)
+
+            // ペイントする色の設定
+            paint.color = Color.argb(255, 255, 0, 255)
+
+            // ペイントストロークの太さを設定
+            paint.strokeWidth = lineStrokeWidth
+
+            // Styleのストロークを設定する
+            paint.style = Paint.Style.STROKE
+
+            // drawRectを使って矩形を描画する、引数に座標を設定
+            // (x1,y1,x2,y2,paint) 左上の座標(x1,y1), 右下の座標(x2,y2)
+            canvas.drawRect(300f, 300f, 600f, 600f, paint)
+
+
+
+        }
+    }*/
 
     override fun onResume() {
         super.onResume()
@@ -228,7 +288,7 @@ class MainActivity : AppCompatActivity() {
         i=0
         var sum_of_square: Int=0
         var min: Int=1000000000
-        var place: String=""
+        //var place: String=""
 
         for (wifiInfo in wifiInfos) {
             for (scanResult in scanResults){
@@ -249,12 +309,28 @@ class MainActivity : AppCompatActivity() {
             if (sum_of_square<min){
                 min=sum_of_square
                 place=wifiInfo.name
+                floor=wifiInfo.floor
             }
             i=0
             sum_of_square=0
         }
         textView.setText(place)
 
+        // val myView = MyView(this)
+        // setContentView(myView)
+
+
+
+        /*if (floor==3) {
+            imageView2.visibility = View.VISIBLE
+            if (place == "北村研") {
+                imageView2.setTranslationX(10F)
+                imageView2.setTranslationY(160F)
+            }
+
+            //val a:Float = imageView2.getY()
+            //imageView2.translationY=10F
+        }*/
 
         for (scanResult in scanResults) {
             Log.d(TAG, scanResult.toString())
@@ -290,21 +366,53 @@ class MainActivity : AppCompatActivity() {
         when (menuItem.itemId) {
             R.id.f1 -> {
                 imageView.setImageResource(R.drawable.first)
+                //floor=1
+                imageView2.visibility = View.INVISIBLE
                 return true
             }
 
             R.id.f2 -> {
                 imageView.setImageResource(R.drawable.second)
+                //floor=2
+                imageView2.visibility = View.INVISIBLE
                 return true
             }
 
             R.id.f3 -> {
                 imageView.setImageResource(R.drawable.three)
+                //floor=3
+                imageView2.visibility = View.INVISIBLE
+                if (floor==3){
+                    imageView2.visibility = View.VISIBLE
+                    if (place=="北村研"){
+                        imageView2.setTranslationX(10F)
+                        imageView2.setTranslationY(160F)
+                    }
+                    if (place=="川端研"){
+                        imageView2.setTranslationX(10F)
+                        imageView2.setTranslationY(80F)
+                    }
+                    if (place=="片寄研"){
+                        imageView2.setTranslationX(10F)
+                        imageView2.setTranslationY(0F)
+                    }
+                    if (place=="井村研"){
+                        imageView2.setTranslationX(-80F)
+                        imageView2.setTranslationY(-60F)
+                    }
+                    if (place=="長田研"){
+                        imageView2.setTranslationX(-170F)
+                        imageView2.setTranslationY(-60F)
+                    }
+                }
+
                 return true
             }
 
             R.id.f4 -> {
                 imageView.setImageResource(R.drawable.fourth)
+                //floor=4
+                imageView2.visibility = View.INVISIBLE
                 return true
             }
         }

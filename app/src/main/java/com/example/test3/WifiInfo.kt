@@ -13,4 +13,5 @@ open class WifiInfo : RealmObject() {
     var level2: Int = 0
     var ssid3: String = ""
     var level3: Int = 0
+    var floor: Int = 0
 }
