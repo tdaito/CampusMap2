@@ -2,9 +2,11 @@ package com.example.test3
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import io.realm.Realm
 import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_database.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 class DatabaseActivity : AppCompatActivity() {
     private lateinit var realm: Realm
